@@ -17,7 +17,7 @@ async function checkWebsite(urlObject) {
     browser = await puppeteer.launch({
       headless: true,
       executablePath: "/usr/bin/chromium",
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage","--single-process"],
       ignoreHTTPSErrors: true,
     });
     const page = await browser.newPage();
@@ -33,8 +33,8 @@ async function checkWebsite(urlObject) {
     });
 
     const response = await page.goto(url, {
-      waitUntil: "networkidle2", // The best compromise for speed and accuracy
-      timeout: 60000,
+      waitUntil: "networkidle2", 
+      timeout: 30000,
     });
 
     let status = "good";
