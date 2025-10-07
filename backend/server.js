@@ -1,8 +1,7 @@
-// Import required packages
-const express = require("express");
-const cors = require('cors');
-require("dotenv").config();
 
+const express = require("express");
+const cors = require("cors");
+require("dotenv").config();
 
 const app = express();
 const port = process.env.PORT || 5001;
@@ -10,21 +9,31 @@ const port = process.env.PORT || 5001;
 
 const frontendURL = "https://website-checker-web-one.vercel.app";
 
-// Apply specific CORS options
+
 app.use(cors({
-  origin: frontendURL
+  origin: frontendURL,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
 }));
 
-app.use(express.json()); 
+app.use(express.json());
 
-// --- ROUTES ---
-app.use("/api/urls", require("./Routes/urlRoutes"));
-app.get('/', (req, res) => {
-    res.send('Website Checker API is running!');
+
+const urlRoutes = require("./Routes/urlRoutes");
+
+
+
+app.use("/api/urls", urlRoutes);
+
+// Optional: add root route
+app.get("/", (req, res) => {
+  res.send("✅ Website Checker API is running successfully!");
 });
 
 
+app.use("/", urlRoutes);
+
 
 app.listen(port, () => {
-  console.log(` Server is running at http://localhost:${port}`);
+  console.log(`🚀 Server is running on port ${port}`);
 });
