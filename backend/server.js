@@ -2,7 +2,8 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-
+const cron = require("node-cron");
+const { sendDailyReport } = require("./services/reportService");
 const app = express();
 const port = process.env.PORT || 5001;
 
@@ -36,4 +37,13 @@ app.use("/", urlRoutes);
 
 app.listen(port, () => {
   console.log(`🚀 Server is running on port ${port}`);
+});
+
+// Schedule the daily report at  current server time
+cron.schedule("* * * * *", () => {
+  console.log("⏰ Running daily report task...");
+  sendDailyReport();
+}, {
+  scheduled: true,
+  timezone: "Asia/Kolkata"
 });

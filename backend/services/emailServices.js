@@ -24,7 +24,7 @@ const sendEmail = async (to, subject, text, attachments) => {
             to: to,
             subject: subject,
             text: text,
-            attachments: attachments,
+            html:html
         });
         console.log(`✅ Email report sent successfully to ${to}`);
     } catch (error) {
