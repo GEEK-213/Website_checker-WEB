@@ -1,8 +1,8 @@
-#!/usr/bin/env bash
-# exit on error
-set -o errexit
+# #!/usr/bin/env bash
+# # exit on error
+# set -o errexit
 
-npm install
+# npm install
 
 
-./node_modules/.bin/puppeteer browsers install chrome
+# ./node_modules/.bin/puppeteer browsers install chrome
