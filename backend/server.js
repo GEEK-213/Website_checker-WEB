@@ -8,7 +8,7 @@ const app = express();
 const port = process.env.PORT || 5001;
 
 
-const frontendURL = "https://website-checker-web-one.vercel.app/";
+const frontendURL = "https://website-checker-web-one.vercel.app";
 
 // Apply specific CORS options
 app.use(cors({
