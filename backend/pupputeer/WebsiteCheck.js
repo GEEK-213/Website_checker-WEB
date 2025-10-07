@@ -34,7 +34,7 @@ async function checkWebsite(urlObject) {
 
     const response = await page.goto(url, {
       waitUntil: "networkidle2", 
-      timeout: 30000,
+      timeout: 60000,
     });
 
     let status = "good";

@@ -125,9 +125,12 @@ exports.runAllChecks = async (req, res) => {
         const { data: urls, error: fetchError } = await supabase.from('urls').select('id, url');
         if (fetchError) throw fetchError;
 
-        const allCheckPromises = urls.map(item => checkWebsite(item));
-        const results = await Promise.all(allCheckPromises);
-
+        const results = [];
+        for (const item of urls) {
+            console.log(`Checking ${item.url}...`);
+            const result = await checkWebsite(item);
+            results.push(result);
+        }
         const resultsToInsert = results.map(result => {
             return {
                 url_id: result.originalUrl.id,
