@@ -16,19 +16,20 @@ const {
 const upload = require("../middleware/multer");
 
 // --- URL Management Routes ---
-router.get("/all", getUrls);           
-router.post("/save", saveUrls);        
+router.get("/all", getUrls);        
+router.post("/save", saveUrls);      
 // --- CSV Routes ---
 router.get("/export", exportUrls);    
 router.post("/import", upload.single("file"), importUrls); 
 
 // --- Website Checking Routes ---
 router.post("/check-solo", checkSoloWebsite);
-router.get("/check-all", runAllChecks);    
-router.get("/results", getLatestResults);     
+router.get("/check-all", runAllChecks);      
+router.get("/results", getLatestResults);      
 
-
-router.all("*", (req, res) => {
+// --- 404 Catch-All Middleware ---
+// This will now handle any requests that don't match the routes above.
+router.use((req, res) => {
   res.status(404).json({ message: "Endpoint not found. Please check the URL path." });
 });
 
