@@ -7,8 +7,6 @@ require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 5001;
 
-// --- MIDDLEWARE ---
-
 
 const frontendURL = "https://website-checker-web-one.vercel.app/";
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Folder, Globe, Upload, Download, Play, Trash2, Zap, AlertTriangle, CheckCircle, Clock, Database, GitBranch, Ban } from 'lucide-react';
 import './DashboardPage.css'; 
 
-const API_BASE_URL = "http://localhost:5001/api/urls";
+const API_BASE_URL = "https://website-checker-hxgo.onrender.com";
 
 // Helper to get status display properties
 const getStatusBadge = (status) => {
