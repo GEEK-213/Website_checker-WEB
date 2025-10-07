@@ -1,7 +1,7 @@
 // services/reportService.js
 
 const supabase = require('../supabaseClient');
-const { sendEmail } = require('./reportService');
+const { sendEmail } = require('./emailServices');
 
 /**
  * Generates an HTML report from the check results.
