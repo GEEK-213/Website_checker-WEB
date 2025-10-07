@@ -40,7 +40,6 @@ async function checkWebsite(urlObject) {
     let error_log = null;
     let publicUrl = null;
 
-    // FIX: Check if the securityDetails object and its .valid method exist before calling it
     const securityDetails = response.securityDetails();
     if (securityDetails && typeof securityDetails.valid === 'function' && !securityDetails.valid()) {
       status = 'ssl_error';
