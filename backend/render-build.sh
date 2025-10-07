@@ -3,4 +3,6 @@
 set -o errexit
 
 npm install
-npx puppeteer browsers install chrome
+
+
+./node_modules/.bin/puppeteer browsers install chrome
