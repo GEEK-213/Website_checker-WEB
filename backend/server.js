@@ -9,8 +9,8 @@ const port = process.env.PORT || 5001;
 
 // --- MIDDLEWARE ---
 
-// Define your specific frontend URL
-const frontendURL = "https://website-checker-web-one.vercel.app";
+
+const frontendURL = "https://website-checker-web-one.vercel.app/";
 
 // Apply specific CORS options
 app.use(cors({
