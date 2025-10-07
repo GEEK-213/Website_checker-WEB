@@ -54,9 +54,9 @@ async function checkWebsite(urlObject) {
       }
     });
 
-    // --- OPTIMIZATION 2: Use a faster waitUntil condition ---
+    // --- FINAL CHANGE: Use the best waitUntil condition ---
     const response = await page.goto(url, {
-      waitUntil: "domcontentloaded", // This is much faster
+      waitUntil: "networkidle2", // The best compromise for speed and accuracy
       timeout: 60000,
     });
 
