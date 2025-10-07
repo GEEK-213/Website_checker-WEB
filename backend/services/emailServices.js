@@ -1,37 +1,39 @@
+// services/mailService.js
+
 const nodemailer = require('nodemailer');
 
-
+// Create a more explicit transporter object for Gmail
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS, // This is your 16-character App Password
-    },
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true, 
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
 });
 
 /**
-
- * @param {string} to 
- * @param {string} subject The subject line of the email.
- * @param {string} text The plain text body of the email.
- * @param {Array} attachments An array of attachment objects for nodemailer.
+ * Sends an email.
+ * @param {string} to - The recipient's email address.
+ * @param {string} subject - The subject of the email.
+ * @param {string} html - The HTML content of the email.
  */
-const sendEmail = async (to, subject, text, attachments) => {
-    try {
-        // 2. Send the email using the pre-configured transporter
-        await transporter.sendMail({
-            from: `"Website Checker" <${process.env.EMAIL_USER}>`,
-            to: to,
-            subject: subject,
-            text: text,
-            html:html
-        });
-        console.log(`✅ Email report sent successfully to ${to}`);
-    } catch (error) {
-        // 3. Log any errors that occur during the process
-        console.error('Error sending email:', error);
-    }
+const sendEmail = async (to, subject, html) => {
+  try {
+    const mailOptions = {
+      from: `"Website Checker Report" <${process.env.EMAIL_USER}>`,
+      to: to,
+      subject: subject,
+      html: html, 
+    };
+
+    let info = await transporter.sendMail(mailOptions);
+    console.log('Email sent: ' + info.response);
+  } catch (error) {
+    console.error('Error sending email:', error);
+    throw error;
+  }
 };
 
 module.exports = { sendEmail };
-
