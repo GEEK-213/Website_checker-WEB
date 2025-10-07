@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-  "start": "node server.js",
-  "start:scheduler": "node scheduler.js"
-},
+    "start": "node server.js",
+    "start:scheduler": "node scheduler.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -20,6 +20,7 @@
     "multer": "^2.0.2",
     "node-cron": "^4.2.1",
     "nodemailer": "^7.0.6",
+    "nodemailer-sendgrid-transport": "^0.2.0",
     "puppeteer": "^24.22.3"
   }
 }
