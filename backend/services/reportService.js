@@ -37,21 +37,24 @@ const generateReportHTML = (results) => {
   `;
 };
 
-
 const sendDailyReport = async () => {
   console.log('Task started: Fetching data for daily report...');
   try {
- 
     const { data, error } = await supabase.rpc('get_latest_check_results');
     if (error) throw error;
     
     if (data && data.length > 0) {
-   
       const reportHTML = generateReportHTML(data);
-
-      const recipient = [ "faariskhan213@gmail.com","gaureshgaude2@gmail.com","chethanbadiger245@gmail.com"];
-      await sendEmail(recipient, 'Daily Website Checker Report', reportHTML);
-      console.log('Daily report sent successfully.');
+      
+      // Use the environment variable for recipients
+      const recipients = process.env.REPORT_RECIPIENTS; 
+      if (!recipients) {
+          console.error('REPORT_RECIPIENTS environment variable not set.');
+          return;
+      }
+      
+      await sendEmail(recipients, 'Daily Website Checker Report', reportHTML);
+      console.log(`Daily report sent successfully to: ${recipients}`);
     } else {
       console.log('No data to report. Skipping email.');
     }
