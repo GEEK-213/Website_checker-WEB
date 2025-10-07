@@ -40,11 +40,11 @@ app.listen(port, () => {
 });
 
 // Schedule the daily report at  current server time
-// cron.schedule('*/2 * * * *', () => {
-//   console.log('Running the scheduled test job every 2 minutes...');
-//    sendDailyReport();
-// }, {
-//    scheduled: true,
-//    timezone: "Asia/Kolkata" 
+cron.schedule('*/2 * * * *', () => {
+  console.log('Running the scheduled test job every 2 minutes...');
+   sendDailyReport();
+}, {
+   scheduled: true,
+   timezone: "Asia/Kolkata" 
 
-// });
+});

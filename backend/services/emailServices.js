@@ -1,37 +1,34 @@
 // services/mailService.js
 
 const nodemailer = require('nodemailer');
+const sgTransport = require('nodemailer-sendgrid-transport');
 
-
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true, 
+const options = {
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
+    // This reads the API key from your Render environment variables
+    api_key: process.env.SENDGRID_API_KEY
+  }
+};
 
-/**
- * Sends an email.
- * @param {string} to - The recipient's email address.
- * @param {string} subject - The subject of the email.
- * @param {string} html - The HTML content of the email.
- */
+const transporter = nodemailer.createTransport(sgTransport(options));
+
 const sendEmail = async (to, subject, html) => {
   try {
     const mailOptions = {
-      from: `"Website Checker Report" <${process.env.EMAIL_USER}>`,
+      // IMPORTANT: Use the email address you verified in SendGrid
+      from: `"Website Checker Report" <valorantgrim1234@gmail.com>`,
       to: to,
       subject: subject,
-      html: html, 
+      html: html,
     };
 
     let info = await transporter.sendMail(mailOptions);
-    console.log('Email sent: ' + info.response);
+    console.log('Email sent via SendGrid: ' + info.messageId);
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error('Error sending email via SendGrid:', error);
+    if (error.response) {
+        console.error(error.response.body)
+    }
     throw error;
   }
 };
