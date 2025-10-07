@@ -4,20 +4,8 @@ const supabase = require("../supabaseClient");
 
 // List of keywords to detect for adult/inappropriate content
 const inappropriateKeywords = [
-  "adult",
-  "18+",
-  "gambling",
-  "casino",
-  "betting",
-  "poker",
-  "viagra",
-  "cialis",
-  "nsfw",
-  "explicit",
-  "erotic",
-  "porn",
-  "sex",
-  "escort",
+  "adult", "18+", "gambling", "casino", "betting", "poker", "viagra", "cialis",
+  "nsfw", "explicit", "erotic", "porn", "sex", "escort",
 ];
 
 async function checkWebsite(urlObject) {
@@ -38,23 +26,12 @@ async function checkWebsite(urlObject) {
     );
     await page.setViewport({ width: 1280, height: 800 });
 
-    // --- OPTIMIZATION 1: Block images, stylesheets, and fonts ---
-    await page.setRequestInterception(true);
-    page.on("request", (req) => {
-      if (["image", "stylesheet", "font"].includes(req.resourceType())) {
-        req.abort();
-      } else {
-        req.continue();
-      }
-    });
-
     page.on("request", (request) => {
       if (request.isNavigationRequest()) {
         redirectChain.push(request.url());
       }
     });
 
-    // --- FINAL CHANGE: Use the best waitUntil condition ---
     const response = await page.goto(url, {
       waitUntil: "networkidle2", // The best compromise for speed and accuracy
       timeout: 60000,
@@ -139,7 +116,7 @@ async function checkWebsite(urlObject) {
       error_log = "A critical SSL certificate error occurred.";
     }
 
-    return { originalUrl: urlObject, url, status, screenshot: null, error_log };
+    return { originalUrl: urlObject, url, status: "error", screenshot: null, error_log: error.message };
   } finally {
     if (browser) {
       await browser.close();
