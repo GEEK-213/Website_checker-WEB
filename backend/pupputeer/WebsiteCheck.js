@@ -2,25 +2,32 @@ const puppeteer = require("puppeteer");
 const { TimeoutError } = require("puppeteer");
 const supabase = require("../supabaseClient");
 
-// List of keywords to detect for adult/inappropriate content
 const inappropriateKeywords = [
   "adult", "18+", "gambling", "casino", "betting", "poker", "viagra", "cialis",
   "nsfw", "explicit", "erotic", "porn", "sex", "escort",
 ];
 
-async function checkWebsite(urlObject) {
-  let browser = null;
+// The function now accepts an optional 'browser' instance as a second argument
+async function checkWebsite(urlObject, browser) {
+  let page;
   const { url } = urlObject;
   const redirectChain = [];
+  let browserLaunchedInternally = false;
 
   try {
-    browser = await puppeteer.launch({
-      headless: true,
-      executablePath: "/usr/bin/chromium",
-      args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage","--single-process"],
-      ignoreHTTPSErrors: true,
-    });
-    const page = await browser.newPage();
+    let browserToUse = browser;
+    // If no browser is passed in, launch a new one (for solo checks)
+    if (!browserToUse) {
+      browserToUse = await puppeteer.launch({
+        headless: true,
+        executablePath: "/usr/bin/chromium",
+        args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage", "--single-process"],
+        ignoreHTTPSErrors: true,
+      });
+      browserLaunchedInternally = true;
+    }
+
+    page = await browserToUse.newPage();
     await page.setUserAgent(
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
     );
@@ -33,7 +40,7 @@ async function checkWebsite(urlObject) {
     });
 
     const response = await page.goto(url, {
-      waitUntil: "networkidle2", 
+      waitUntil: "networkidle2",
       timeout: 60000,
     });
 
@@ -118,8 +125,12 @@ async function checkWebsite(urlObject) {
 
     return { originalUrl: urlObject, url, status: "error", screenshot: null, error_log: error.message };
   } finally {
-    if (browser) {
-      await browser.close();
+    if (page) {
+      await page.close();
+    }
+    // Only close the browser if it was launched inside this function (for a solo check)
+    if (browserLaunchedInternally && page) {
+      await page.browser().close();
     }
   }
 }
