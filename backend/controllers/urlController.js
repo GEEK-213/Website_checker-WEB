@@ -7,7 +7,12 @@ const { checkWebsite } = require('../pupputeer/WebsiteCheck');
 
 exports.getUrls = async (req, res) => {
   try {
-    const { data, error } = await supabase.from('urls').select('id, url');
+    // ONLY get URLs for the currently logged-in user
+    const { data, error } = await supabase
+      .from('urls')
+      .select('id, url')
+      .eq('user_id', req.user.id); // Use the user ID from the middleware
+
     if (error) throw error;
     res.status(200).json(data);
   } catch (err) {
@@ -23,14 +28,20 @@ exports.saveUrls = async (req, res) => {
       return res.status(400).json({ error: "Invalid input: 'urls' must be an array." });
     }
 
-    const { error: deleteError } = await supabase.from('urls').delete().neq('id', 0);
+    const { error: deleteError } = await supabase.from('urls').delete().eq('user_id', req.user.id);
     if (deleteError) throw deleteError;
 
     if (urls.length === 0) {
-        return res.status(200).json({ message: "All URLs cleared successfully." });
+      return res.status(200).json({ message: "All of this user's URLs were cleared." });
     }
 
-    const { data, error } = await supabase.from('urls').insert(urls.map(url => ({ url })));
+   
+    const urlsToInsert = urls.map(url => ({
+      url: url.url,
+      user_id: req.user.id
+    }));
+
+    const { data, error } = await supabase.from('urls').insert(urlsToInsert).select();
     if (error) throw error;
 
     res.status(201).json({ message: "URLs saved successfully.", count: data ? data.length : 0 });
@@ -40,12 +51,12 @@ exports.saveUrls = async (req, res) => {
   }
 };
 
-
 // --- CSV Functionality ---
 
 exports.exportUrls = async (req, res) => {
     try {
-        const { data, error } = await supabase.from('urls').select('url');
+        // ONLY get URLs for the currently logged-in user
+        const { data, error } = await supabase.from('urls').select('url').eq('user_id', req.user.id);
         if (error) throw error;
 
         res.setHeader('Content-Type', 'text/csv');
@@ -71,13 +82,14 @@ exports.importUrls = async (req, res) => {
 
         stream.pipe(csv.parse({ headers: false }))
             .on('error', error => { throw error; })
-            .on('data', row => urlsToInsert.push({ url: row[0] }))
+            // Add the user_id to each URL from the CSV
+            .on('data', row => urlsToInsert.push({ url: row[0], user_id: req.user.id }))
             .on('end', async () => {
                 try {
                     if (urlsToInsert.length > 0) {
                         const { data, error } = await supabase.from('urls').insert(urlsToInsert);
                         if (error) throw error;
-                        res.status(201).json({ message: 'URLs imported successfully.', count: data ? data.length : 0 });
+                        res.status(201).json({ message: 'URLs imported successfully.', count: urlsToInsert.length });
                     } else {
                         res.status(200).json({ message: 'No URLs found in CSV.' });
                     }
@@ -92,72 +104,71 @@ exports.importUrls = async (req, res) => {
     }
 };
 
-// --- Website Checking Logic ---
+
+
 
 exports.checkSoloWebsite = async (req, res) => {
-    try {
-        const { url, url_id } = req.body;
-        if (!url || !url_id) {
-            return res.status(400).json({ error: 'URL and URL ID are required.' });
-        }
-        
-        const result = await checkWebsite({ id: url_id, url: url });
-        
-        const { data, error } = await supabase.from('check_results').insert([{
-            url_id: result.originalUrl.id,
-            url: result.originalUrl.url, // Always use the original URL
-            status: result.status,
-            error_log: result.error_log,
-            screenshot: result.screenshot
-        }]).select();
+  
+  try {
+      const { url, url_id } = req.body;
+      const result = await checkWebsite({ id: url_id, url: url });
+      
+      const { data, error } = await supabase.from('check_results').insert([{
+          url_id: result.originalUrl.id,
+          url: result.originalUrl.url,
+          status: result.status,
+          error_log: result.error_log,
+          screenshot: result.screenshot,
+          user_id: req.user.id
+      }]).select();
 
-        if (error) throw error;
-        res.status(201).json({ message: `Check complete for ${url}`, result: data[0] });
-
-    } catch (err) {
-        console.error('Error in solo check:', err);
-        res.status(500).json({ error: 'Failed to perform website check.' });
-    }
+      if (error) throw error;
+      res.status(201).json({ message: `Check complete for ${url}`, result: data[0] });
+  } catch (err) {
+      console.error('Error in solo check:', err);
+      res.status(500).json({ error: 'Failed to perform website check.' });
+  }
 };
 
 exports.runAllChecks = async (req, res) => {
-    try {
-        const { data: urls, error: fetchError } = await supabase.from('urls').select('id, url');
-        if (fetchError) throw fetchError;
 
-        const results = [];
-        for (const item of urls) {
-            console.log(`Checking ${item.url}...`);
-            const result = await checkWebsite(item);
-            results.push(result);
-        }
-        const resultsToInsert = results.map(result => {
-            return {
-                url_id: result.originalUrl.id,
-                url: result.originalUrl.url, // Always use the original URL
-                status: result.status,
-                error_log: result.error_log,
-                screenshot: result.screenshot,
-            };
-        });
+  try {
+      const { data: urls, error: fetchError } = await supabase.from('urls').select('id, url').eq('user_id', req.user.id);
+      if (fetchError) throw fetchError;
 
-        if (resultsToInsert.length > 0) {
-            const { data, error: insertError } = await supabase.from('check_results').insert(resultsToInsert).select();
-            if (insertError) throw insertError;
-            res.status(201).json({ message: 'All checks completed.', results: data });
-        } else {
-            res.status(200).json({ message: 'No websites to check.' });
-        }
+      const results = [];
+      for (const item of urls) {
+          const result = await checkWebsite(item);
+          results.push(result);
+      }
 
-    } catch (err) {
-        console.error('Error running all checks:', err);
-        res.status(500).json({ error: 'Failed to run all website checks.' });
-    }
+      const resultsToInsert = results.map(result => ({
+          url_id: result.originalUrl.id,
+          url: result.originalUrl.url,
+          status: result.status,
+          error_log: result.error_log,
+          screenshot: result.screenshot,
+          user_id: req.user.id 
+      }));
+
+      if (resultsToInsert.length > 0) {
+          const { data, error: insertError } = await supabase.from('check_results').insert(resultsToInsert).select();
+          if (insertError) throw insertError;
+          res.status(201).json({ message: 'All checks completed.', results: data });
+      } else {
+          res.status(200).json({ message: 'No websites to check.' });
+      }
+  } catch (err) {
+      console.error('Error running all checks:', err);
+      res.status(500).json({ error: 'Failed to run all website checks.' });
+  }
 };
 
+
 exports.getLatestResults = async (req, res) => {
+  
     try {
-        const { data, error } = await supabase.rpc('get_latest_check_results');
+        const { data, error } = await supabase.rpc('get_latest_check_results_for_user', { p_user_id: req.user.id });
         if (error) throw error;
         res.status(200).json(data);
     } catch (err) {
@@ -165,26 +176,3 @@ exports.getLatestResults = async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch latest results.' });
     }
 };
-
-
-// exports.getResultsByDate = async (req, res) => {
-//     try {
-//         const { date } = req.params; // date format: YYYY-MM-DD
-//         const startDate = new Date(`${date}T00:00:00.000Z`);
-//         const endDate = new Date(`${date}T23:59:59.999Z`);
-
-//         const { data, error } = await supabase
-//             .from('check_results')
-//             .select('*')
-//             .gte('created_at', startDate.toISOString())
-//             .lte('created_at', endDate.toISOString())
-//             .order('created_at', { ascending: false });
-
-//         if (error) throw error;
-//         res.status(200).json(data);
-//     } catch (err) {
-//         console.error("Error in getResultsByDate:", err);
-//         res.status(500).json({ error: 'Failed to fetch results for the specified date.' });
-//     }
-// };
-
