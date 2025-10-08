@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import ProtectedRoute from './components/ProtectedRoute'; // The guard for your private pages
+import ProtectedRoute from './components/ProtectRoute'; 
 import DashboardPage from './pages/DashboardPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
