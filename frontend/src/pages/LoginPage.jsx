@@ -29,7 +29,10 @@ function LoginPage() {
   };
 
   return (
+    
+
     <div className="login-container">
+      <h1>Welcome to Website Checker</h1>
       <h2>Login</h2>
       <form onSubmit={handleLogin}>
         <input 
