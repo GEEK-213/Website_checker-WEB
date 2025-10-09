@@ -147,8 +147,12 @@ const DashboardPage = () => {
                     </a>
                 </nav>
              
-                 <div className="sidebar-footer">
+                 <div className="sidebar-profile">
                     {user && <p className="user-email">{user.email}</p>}
+                    {user && <p className="user-id">ID: {user.id}</p>}
+                    {user && <p className="user-role">Role: {user.role}</p>}
+                    {user && <p className="user-name">Name: {user.name}</p>}
+                    
                     <button onClick={signOut} className="logout-btn">Logout</button>
                 </div>
             </aside>
