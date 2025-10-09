@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // 1. Import useNavigate and Link
+import { Link, useNavigate } from 'react-router-dom'; 
 import { supabase } from '../supabaseClient';
-
+import './LoginPage.css';
 function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const navigate = useNavigate(); // 2. Initialize the navigate function
+  const navigate = useNavigate(); 
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -23,13 +23,13 @@ function LoginPage() {
       setError(signInError.message);
       setLoading(false);
     } else {
-      // 3. On success, explicitly navigate to the dashboard
+
       navigate('/'); 
     }
   };
 
   return (
-    <div>
+    <div className="login-container">
       <h2>Login</h2>
       <form onSubmit={handleLogin}>
         <input 

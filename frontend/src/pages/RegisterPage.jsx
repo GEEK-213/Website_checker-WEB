@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-
+import './RegisterPage.css';
 function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -14,8 +14,7 @@ function RegisterPage() {
     setLoading(true);
     setError(null);
     setMessage('');
-
-    // Use the Supabase signUp function
+ 
     const { error } = await supabase.auth.signUp({
       email: email,
       password: password,
@@ -30,11 +29,11 @@ function RegisterPage() {
   };
 
   return (
-    <div>
+    <div className="register-container">
       <h2>Register a New Account</h2>
       <form onSubmit={handleRegister}>
         <div>
-          <label htmlFor="email">Email address</label>
+          <label htmlFor="email"></label>
           <input
             id="email"
             type="email"
@@ -45,7 +44,7 @@ function RegisterPage() {
           />
         </div>
         <div>
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password"></label>
           <input
             id="password"
             type="password"
