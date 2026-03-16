@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom'; 
 import { supabase } from '../supabaseClient';
+import { ShieldCheck, Mail, Lock, Server } from 'lucide-react';
 import './LoginPage.css';
+
 function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,44 +25,73 @@ function LoginPage() {
       setError(signInError.message);
       setLoading(false);
     } else {
-
       navigate('/'); 
     }
   };
 
   return (
-    
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="auth-header">
+           <div className="auth-logo">
+             <Server size={32} className="text-good" />
+           </div>
+           <h1>Infrastructure Login</h1>
+           <p className="auth-subtitle">Website Checker Enterprise Terminal</p>
+        </div>
 
-    <div className="login-container">
-      <h1>Welcome to Website Checker</h1>
-      <h2>Login</h2>
-      <form onSubmit={handleLogin}>
-        <input 
-          id="email" 
-          name="email"
-          type="email" 
-          placeholder="Your email" 
-          value={email} 
-          onChange={(e) => setEmail(e.target.value)} 
-          required 
-        />
-        <input 
-          id="password" 
-          name="password"
-          type="password" 
-          placeholder="Your password" 
-          value={password} 
-          onChange={(e) => setPassword(e.target.value)} 
-          required 
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? 'Logging in...' : 'Log In'}
-        </button>
-      </form>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-       <p>
-        Don't have an account? <Link to="/register">Register</Link>
-      </p>
+        <form onSubmit={handleLogin} className="auth-form">
+          <div className="form-group">
+            <label htmlFor="email">Security Identity</label>
+            <div className="input-icon-wrapper">
+               <Mail size={18} className="input-icon" />
+               <input 
+                id="email" 
+                name="email"
+                type="email" 
+                placeholder="registered@enterprise.com" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+                required 
+              />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="password">Access Key</label>
+            <div className="input-icon-wrapper">
+               <Lock size={18} className="input-icon" />
+               <input 
+                id="password" 
+                name="password"
+                type="password" 
+                placeholder="••••••••" 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)} 
+                required 
+              />
+            </div>
+          </div>
+
+          <button type="submit" className="btn-primary auth-submit" disabled={loading}>
+            {loading ? 'Authenticating...' : 'Enter System'}
+          </button>
+        </form>
+
+        {error && (
+          <div className="auth-error">
+             <ShieldCheck size={16} />
+             <span>{error}</span>
+          </div>
+        )}
+
+        <div className="auth-footer">
+           <p>
+            Unauthorized access is restricted. <br/>
+            Need an account? <Link to="/register">Request Access</Link>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,0 +1,10 @@
+ConnectionClosedError: Connection closed.
+    at Connection._rawSend (C:\Users\faari\OneDrive\Desktop\webcheck\Website_checker-WEB\backend\node_modules\puppeteer-core\lib\cjs\puppeteer\cdp\Connection.js:97:35)
+    at Connection.send (C:\Users\faari\OneDrive\Desktop\webcheck\Website_checker-WEB\backend\node_modules\puppeteer-core\lib\cjs\puppeteer\cdp\Connection.js:90:21)
+    at CdpPage.close (C:\Users\faari\OneDrive\Desktop\webcheck\Website_checker-WEB\backend\node_modules\puppeteer-core\lib\cjs\puppeteer\cdp\Page.js:856:34)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async checkWebsite (C:\Users\faari\OneDrive\Desktop\webcheck\Website_checker-WEB\backend\puppeteer\WebsiteCheck.js:142:7)
+    at async C:\Users\faari\OneDrive\Desktop\webcheck\Website_checker-WEB\backend\controllers\urlController.js:162:14
+    at async Promise.all (index 0)
+    at async exports.runAllChecks (C:\Users\faari\OneDrive\Desktop\webcheck\Website_checker-WEB\backend\controllers\urlController.js:166:21)
+    at async C:\Users\faari\OneDrive\Desktop\webcheck\Website_checker-WEB\backend\server.js:45:24

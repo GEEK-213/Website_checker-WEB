@@ -11,11 +11,11 @@ const port = process.env.PORT || 5001;
 const frontendURL = "https://website-checker-web-one.vercel.app";
 
 
-app.use(cors({
-  origin: frontendURL,
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true,
-}));
+app.use(cors()); // Allow all for local dev
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
 
 app.use(express.json());
 
@@ -32,21 +32,18 @@ app.get("/", (req, res) => {
 });
 
 
-app.use("/", urlRoutes);
-
+app.use("/api/urls", urlRoutes);
 app.use("/api/auth", require("./Routes/authRoutes"));
-
 
 app.listen(port, () => {
   console.log(`🚀 Server is running on port ${port}`);
 });
 
-// Schedule the daily report at  current server time
-// cron.schedule('*/2 * * * *', () => {
-//   console.log('Running the scheduled test job every 2 minutes...');
-//    sendDailyReport();
-// }, {
-//    scheduled: true,
-//    timezone: "Asia/Kolkata" 
-
-// });
+// Schedule the daily report at 9:00 AM IST
+cron.schedule('0 9 * * *', () => {
+  console.log('Executing daily infrastructure status report (0900 IST)...');
+  sendDailyReport();
+}, {
+  scheduled: true,
+  timezone: "Asia/Kolkata" 
+});
